@@ -19,22 +19,31 @@
     </div>
     <div class=main>
         <div class="regisration_form">
-            <form th:action="@{/registration/submit}" method="POST">
-                <h3>新規登録</h3>
+            <form th:action="@{/registration/submit/{id}(id=${editId})}" method="POST" th:object="${transactionForm}">
+
+			<h3>新規登録</h3>
                 <p style="margin: 10px 0;">
-                    <input type="radio" id="income" name="flow" value="income" class="form-check-input">
-                    <label for="income" class="form-check-label">収入</label>
-                    <input type="radio" id="expense" name="flow" value="expense" class="form-check-input"  checked>
-                    <label for="expense" class="form-check-label">支出</label>
+                    <div th:if="${transactionForm.flow == 'income'}">
+						<input type="radio" id="income" name="flow" value="income" class="form-check-input" checked>
+	                    <label for="income" class="form-check-label">収入</label>
+	                    <input type="radio" id="expense" name="flow" value="expense" class="form-check-input">
+	                    <label for="expense" class="form-check-label">支出</label>
+                    </div>
+					<div th:th:unless="${transactionForm.flow == 'income'}">
+						<input type="radio" id="income" name="flow" value="income" class="form-check-input">
+					    <label for="income" class="form-check-label">収入</label>
+					    <input type="radio" id="expense" name="flow" value="expense" class="form-check-input"  checked>
+					    <label for="expense" class="form-check-label">支出</label>
+					</div>
                 </p>
                 <label for="name" class="form-label">内容</label>
-                <input type="text" id="name" name="name" class="form-control" required>
+                <input type="text" th:field="*{name}" class="form-control" required>
 
                 <label for="price" class="form-label">金額</label>
-                <input type="number" id="price" name="price" class="form-control" required>
+                <input type="number" th:field="*{price}" id="price" name="price" class="form-control" required>
 
                 <label for="genre" class="form-label">ジャンル</label>
-                <select id="genre" name="genre" class="form-select">
+                <select id="genre" th:field="*{genre}" class="form-select">
                     <option value="">選択</option>
                     <option value="salary">給与</option>
                     <option value="side_income">副収入</option>
@@ -48,7 +57,7 @@
                 </select>
 
                 <label for="date" class="form-label">日付</label>
-                <input type="date" id="date" name="date" class="form-control" required>
+                <input type="date" th:field="*{date}" class="form-control" required>
 
                 <button type="submit" class="btn btn-primary" style="margin-top: 10px;">登録</button>
 

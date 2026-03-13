@@ -27,12 +27,10 @@
 <!--                <canvas id="trendChart"></canvas>-->
 <!--            </div>-->
 <!--        </div>-->
-<!--        @if(session("advice"))-->
-<!--        <h5 style="margin-left:5px">AIのアドバイス</h5>-->
-<!--        <div class="advice_area">-->
-<!--            <p>{!! session("advice") !!}</p>-->
-<!--        </div>-->
-<!--        @endif-->
+		<div class="advice_area" th:if="${advice != null}">
+        <h5 style="margin-left:5px">AIのアドバイス</h5>
+            <p th:text=${advice}></p>
+        </div>
         <div class="table_top">
             <h4 style="margin-right:auto">入出金履歴</h4>
             <button type="button" class="btn btn-success" th:onclick='|location.href="@{/registration}"|'>追加</button>
@@ -54,9 +52,10 @@
 					<td th:unless="${transaction.flow == 'expense'}">収入</td>
                     <td th:text=${transaction.name}></td>
 					<td th:text=${transaction.price}></td>
-					<td th:text=${transaction.dateString}></td>					
-                    <td style="width:150px"><button class="btn btn-primary btn-sm" onclick='location.href="{{ route("edit",$transaction->id) }}"'>編集</button>
-                        <button class="btn btn-danger btn-sm" onclick='location.href="{{ route("delete",$transaction->id) }}"'>削除</button>
+					<td th:text=${transaction.dateString}></td>
+                    <td style="width:150px">
+						<button class="btn btn-primary btn-sm" th:onclick='|location.href="@{/edit/{id}(id=${transaction.id})}"|'>編集</button>
+                        <button class="btn btn-danger btn-sm" th:onclick='|location.href="@{/delete/{id}(id=${transaction.id})}"|'>削除</button>
                     </td>
                 </tr>
             </tbody>

@@ -13,4 +13,5 @@ public class Transaction {
 	private int price;
 	private String genre;
 	private String dateString;
+	private int id;
 }
