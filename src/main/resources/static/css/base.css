@@ -1,0 +1,71 @@
+.main{
+    padding: 10px 20px;
+}
+
+.regisration_form{
+    width: 60%;
+    margin: 10px auto;
+    background-color: rgb(244, 244, 244);
+    padding: 20px;
+    border-radius: 20px;
+}
+
+.header{
+    display: flex;
+    background-color: #6CA651;
+    height: 60px;
+    padding-left: 20px;
+    align-items: center;
+}
+
+.header a{
+    color: black;
+    text-decoration: none;
+}
+
+.header .content{
+    text-decoration: underline;
+    padding-left: 20px;
+}
+
+.logo{
+    font-size: 2rem;
+    font-weight: bold;
+    color: rgb(0, 0, 0);
+    text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.2);
+}
+
+.form-label {
+    margin-bottom: .2rem;
+    margin-top: .4rem;
+}
+
+.graph_area{
+    display: flex;
+    align-items: flex-end;
+    flex-direction: row;
+    justify-content: center;
+    flex-shrink: 1;
+    align-items: center;
+}
+
+.table_top{
+    display: flex;
+    justify-content: flex-end;
+}
+.table_top button{
+    margin-left:10px;
+}
+
+.advice_area{
+    margin: 3px;
+    padding: 10px 20px;
+    background-color: rgb(241, 241, 241);
+    border-radius: 5px;
+}
+
+@media(max-width:768px){
+    .graph_area{
+        flex-direction: column;
+    }
+}
