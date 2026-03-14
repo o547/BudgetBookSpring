@@ -3,6 +3,7 @@ package com.example.demo.form;
 import java.sql.Date;
 
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Past;
 
 import lombok.Data;
 
@@ -19,5 +20,6 @@ public class TransactionForm {
 	
 	private String genre;
 	
+	@Past
 	private Date date;
 }

@@ -1,7 +1,11 @@
 package com.example.demo.controller;
 
+import java.math.BigDecimal;
 import java.sql.Date;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -32,6 +36,7 @@ public class BudgetController {
 	
 	@GetMapping("/index")
 	public String index(Model model){
+		//入出力リスト
 		String sql="SELECT transactions.flow,"
 				+ "transactions.name,"
 				+ "transactions.price,"
@@ -53,7 +58,90 @@ public class BudgetController {
 			transactions.add(transaction);
 		}
 		model.addAttribute("transactions", transactions);
+		
+		//今月分の円グラフ
+		
+		LocalDateTime nowDate = LocalDateTime.now();
+		LocalDateTime nextMonth = nowDate.plusMonths(1);
 
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-01");
+		String nowDateString = formatter.format(nowDate);
+		String nextMonthString = formatter.format(nextMonth);
+
+		//ジャンルごとの今月の出費
+		Map<String, String> sums = new HashMap<String, String>();		
+		String[] genres= {"fixed","food", "daily_necessities", "beauty", "entertainment", "other"};
+		for(String genre : genres) {
+	        sql = "SELECT SUM(price) "
+	        		+ "FROM transactions "
+	        		+ "WHERE genre = ? "
+	          		+ "AND `date` BETWEEN ? AND ? ";
+	          Map<String, Object> map = jdbcTemplate.queryForMap(sql,genre,nowDateString,nextMonthString);
+	
+	        if(map.get("SUM(price)")==null) {
+	        	sums.put(genre, "0");
+	        }else {
+	        	sums.put(genre, map.get("SUM(price)").toString());
+	        }
+		}
+		
+		//今月の出費合計額
+		sql = "SELECT SUM(price) "
+        		+ "FROM transactions "
+          		+ "WHERE flow = 'expense' "
+          		+ "AND `date` BETWEEN ? AND ? ";
+          Map<String, Object> map = jdbcTemplate.queryForMap(sql,nowDateString,nextMonthString);
+
+        if(map.get("SUM(price)")==null) {
+        	sums.put("sum", "0");
+        }else {
+        	sums.put("sum", map.get("SUM(price)").toString());
+        }
+
+		model.addAttribute("sums", sums);
+		
+		//棒グラフ
+		int[] incomes = new int[6];	
+		int[] expenses = new int[6];		
+		int[] month_labels = new int[6];		
+
+		for(int i=5; i>=0; i--) {
+			LocalDateTime startDate = nowDate.plusMonths(-1*i);
+			LocalDateTime endDate = nowDate.plusMonths(-1*i+1);
+			String startDateString = formatter.format(startDate);
+			String endDateString = formatter.format(endDate);
+			month_labels[5-i]=Integer.parseInt(startDateString.split("-")[1]);
+			sql = "SELECT SUM(price) "
+	        		+ "FROM transactions "
+	          		+ "WHERE flow = ? "
+	          		+ "AND `date` BETWEEN ? AND ? ";
+	          Map<String, Object> expenseMap = jdbcTemplate.queryForMap(sql,"expense", startDateString, endDateString);
+	          Map<String, Object> incomeMap = jdbcTemplate.queryForMap(sql,"income", startDateString, endDateString);
+
+	          if(expenseMap.get("SUM(price)")==null) {
+	        	  expenses[5-i]=0;
+	          }else {
+	        	  BigDecimal price = new BigDecimal(expenseMap.get("SUM(price)").toString());
+	        	  expenses[5-i]=price.intValue();
+	          }
+	          
+	          if(incomeMap.get("SUM(price)")==null) {
+	        	  incomes[5-i]=0;
+	          }else {
+	        	  BigDecimal price = new BigDecimal(incomeMap.get("SUM(price)").toString());
+	        	  incomes[5-i]=price.intValue();
+	          	sums.put("sum", map.get("SUM(price)").toString());
+	          }
+
+		
+		}
+		
+		model.addAttribute("incomes", incomes);
+		model.addAttribute("expenses", expenses);
+		model.addAttribute("month_labels", month_labels);
+
+		
+	
 		return "index";
 	}
 
@@ -141,7 +229,7 @@ public class BudgetController {
 			if(++count > 20) break;
 		}
 		
-	    Client client = Client.builder().apiKey("api").build();
+	    Client client = Client.builder().apiKey("key").build();
 	    GenerateContentResponse response =
 	        client.models.generateContent(
 	            "gemini-3-flash-preview",

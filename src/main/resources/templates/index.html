@@ -17,16 +17,16 @@
 		<u><a th:href="@{/index}" style="margin-left: 20px;">一覧</a></u>
     </div>
     <div class="main">
-<!--        <div class="graph_area">-->
-<!--            @if($sums["sum"]!=0)-->
-<!--            <div style="width:450px; height:225px; margin-bottom:20px">-->
-<!--                <canvas id="monthChart"></canvas>-->
-<!--            </div>-->
-<!--            @endif-->
-<!--            <div style="width:450px; height:225px; margin-top:10px">-->
-<!--                <canvas id="trendChart"></canvas>-->
-<!--            </div>-->
-<!--        </div>-->
+        <div class="graph_area">
+            
+            <div th:if="${sums.sum != '0'}" style="width:450px; height:225px; margin-bottom:20px">
+                <canvas id="monthChart"></canvas>
+            </div>
+
+            <div style="width:450px; height:225px; margin-top:10px">
+                <canvas id="trendChart"></canvas>
+            </div>
+        </div>
 		<div class="advice_area" th:if="${advice != null}">
         <h5 style="margin-left:5px">AIのアドバイス</h5>
             <p th:text=${advice}></p>
@@ -61,6 +61,101 @@
             </tbody>
         </table>
 
+		<script>
+		    
+			if( [[${sums.sum}]] != 0 ){
+		    new Chart(document.getElementById("monthChart"), {
+		        type: "doughnut",
+		        data: {
+		            labels: ["固定費", "食費", "日用品", "美容", "交際費", "その他"],
+		            datasets: [{
+		                // $genres=["fixed","food","daily_necessities","beauty","entertainment","other"];
+
+		                data: ["[[${sums.fixed}]]",
+		                    "[[${sums.food}]]",
+							"[[${sums.daily_necessities}]]",
+							"[[${sums.beauty}]]",
+							"[[${sums.entertainment}]]",
+							"[[${sums.other}]]",
+							],
+		                backgroundColor: [
+		                    "#00361e",
+		                    "#006243",
+		                    "#1a915d",
+		                    "#56c278",
+		                    "#8af697",
+		                    "rgb(137, 137, 137)",
+		                ],
+		            }, ],
+		        },
+		        options: {
+		            legend: {
+		                display: false,
+		            },
+		            title: {
+		                display: true,
+		                text: '今月の支出(計[[${sums.sum}]]円)'
+		            }
+		        },
+		    });
+			}
+	
+		    const data = {
+		        labels: ["[[ ${month_labels[0]} ]]",
+		                "[[ ${month_labels[1]} ]]",
+						"[[ ${month_labels[2]} ]]",
+						"[[ ${month_labels[3]} ]]",
+						"[[ ${month_labels[4]} ]]",
+						"[[ ${month_labels[5]} ]]",
+		            ],
+		        datasets: [{
+		            type: 'bar',
+		            label: '収入',
+		            backgroundColor: "rgb(37, 103, 30)",
+		            borderColor: "rgb(37, 103, 30)",
+		            data: ["[[ ${incomes[0]} ]]",
+		                    "[[ ${incomes[1]} ]]",
+		                    "[[ ${incomes[2]} ]]",
+		                    "[[ ${incomes[3]} ]]",
+		                    "[[ ${incomes[4]} ]]",
+		                    "[[ ${incomes[5]} ]]",
+		                ],
+		        }, {
+		            type: 'bar',
+		            label: '支出',
+		            backgroundColor: "rgb(84, 185, 21)",
+		            borderColor: "rgb(84, 185, 21)",
+		            data: ["[[ ${expenses[0]} ]]",
+		                    "[[ ${expenses[1]} ]]",
+							"[[ ${expenses[2]} ]]",
+							"[[ ${expenses[3]} ]]",
+							"[[ ${expenses[4]} ]]",
+							"[[ ${expenses[5]} ]]",
+		                ],
+		        }, ]
+		    };
+
+
+		    const config = {
+		        type: 'bar',
+		        data: data,
+		        options: {
+		            plugins: {
+		                title: {
+		                    text: 'Chart.js Combo Time Scale',
+		                    display: true
+		                }
+		            },
+		            scales: {
+		                x: {
+		                    display: true,
+		                },
+		            },
+		        },
+		    };
+
+		    new Chart(document.getElementById("trendChart"), config);
+		</script>
 </body>
 
 </html>
