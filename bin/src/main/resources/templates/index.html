@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BudgetBook-index</title>
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js"></script>
+</head>
+
+<body>
+    <div class="header">
+		<div class="logo"><a th:href="@{/index}">BudgetBook</a></div>
+		<u><a th:href="@{/registration}" style="margin-left: 30px;">新規登録</a></u>
+		<u><a th:href="@{/index}" style="margin-left: 20px;">一覧</a></u>
+    </div>
+    <div class="main">
+        <div class="graph_area">
+            
+            <div th:if="${sums.sum != '0'}" style="width:450px; height:225px; margin-bottom:20px">
+                <canvas id="monthChart"></canvas>
+            </div>
+
+            <div style="width:450px; height:225px; margin-top:10px">
+                <canvas id="trendChart"></canvas>
+            </div>
+        </div>
+		<div class="advice_area" th:if="${advice != null}">
+        <h5 style="margin-left:5px">AIのアドバイス</h5>
+            <p th:text=${advice}></p>
+        </div>
+        <div class="table_top">
+            <h4 style="margin-right:auto">入出金履歴</h4>
+            <button type="button" class="btn btn-success" th:onclick='|location.href="@{/registration}"|'>追加</button>
+            <button type="button" class="btn btn-success" th:onclick='|location.href="@{/advice}"|'>AIにアドバイスを依頼</button>
+        </div>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">種類</th>
+                    <th scope="col">内容</th>
+                    <th scope="col">金額</th>
+                    <th scope="col">日付</th>
+                    <th scope="col" style="width:150px">操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each=transaction:${transactions} >
+					<td th:if="${transaction.flow == 'expense'}">支出</td>
+					<td th:unless="${transaction.flow == 'expense'}">収入</td>
+                    <td th:text=${transaction.name}></td>
+					<td th:text=${transaction.price}></td>
+					<td th:text=${transaction.dateString}></td>
+                    <td style="width:150px">
+						<button class="btn btn-primary btn-sm" th:onclick='|location.href="@{/edit/{id}(id=${transaction.id})}"|'>編集</button>
+                        <button class="btn btn-danger btn-sm" th:onclick='|location.href="@{/delete/{id}(id=${transaction.id})}"|'>削除</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+		<script>
+		    
+			if( [[${sums.sum}]] != 0 ){
+		    new Chart(document.getElementById("monthChart"), {
+		        type: "doughnut",
+		        data: {
+		            labels: ["固定費", "食費", "日用品", "美容", "交際費", "その他"],
+		            datasets: [{
+		                // $genres=["fixed","food","daily_necessities","beauty","entertainment","other"];
+
+		                data: ["[[${sums.fixed}]]",
+		                    "[[${sums.food}]]",
+							"[[${sums.daily_necessities}]]",
+							"[[${sums.beauty}]]",
+							"[[${sums.entertainment}]]",
+							"[[${sums.other}]]",
+							],
+		                backgroundColor: [
+		                    "#00361e",
+		                    "#006243",
+		                    "#1a915d",
+		                    "#56c278",
+		                    "#8af697",
+		                    "rgb(137, 137, 137)",
+		                ],
+		            }, ],
+		        },
+		        options: {
+		            legend: {
+		                display: false,
+		            },
+		            title: {
+		                display: true,
+		                text: '今月の支出(計[[${sums.sum}]]円)'
+		            }
+		        },
+		    });
+			}
+	
+		    const data = {
+		        labels: ["[[ ${month_labels[0]} ]]",
+		                "[[ ${month_labels[1]} ]]",
+						"[[ ${month_labels[2]} ]]",
+						"[[ ${month_labels[3]} ]]",
+						"[[ ${month_labels[4]} ]]",
+						"[[ ${month_labels[5]} ]]",
+		            ],
+		        datasets: [{
+		            type: 'bar',
+		            label: '収入',
+		            backgroundColor: "rgb(37, 103, 30)",
+		            borderColor: "rgb(37, 103, 30)",
+		            data: ["[[ ${incomes[0]} ]]",
+		                    "[[ ${incomes[1]} ]]",
+		                    "[[ ${incomes[2]} ]]",
+		                    "[[ ${incomes[3]} ]]",
+		                    "[[ ${incomes[4]} ]]",
+		                    "[[ ${incomes[5]} ]]",
+		                ],
+		        }, {
+		            type: 'bar',
+		            label: '支出',
+		            backgroundColor: "rgb(84, 185, 21)",
+		            borderColor: "rgb(84, 185, 21)",
+		            data: ["[[ ${expenses[0]} ]]",
+		                    "[[ ${expenses[1]} ]]",
+							"[[ ${expenses[2]} ]]",
+							"[[ ${expenses[3]} ]]",
+							"[[ ${expenses[4]} ]]",
+							"[[ ${expenses[5]} ]]",
+		                ],
+		        }, ]
+		    };
+
+
+		    const config = {
+		        type: 'bar',
+		        data: data,
+		        options: {
+		            plugins: {
+		                title: {
+		                    text: 'Chart.js Combo Time Scale',
+		                    display: true
+		                }
+		            },
+		            scales: {
+		                x: {
+		                    display: true,
+		                },
+		            },
+		        },
+		    };
+
+		    new Chart(document.getElementById("trendChart"), config);
+		</script>
+</body>
+
+</html>
